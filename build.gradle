@@ -94,3 +94,36 @@ task generateMyResources {
 		versionProps.store(versionPropsFile.newWriter(), null);
 	}
 }
+
+task usrdoc(type:Exec) {
+	group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = 'Builds the user documentation (html)'
+	def infile=new File(project.projectDir,'docs/ilimanager.rst')
+	def outfile=new File(project.buildDir,'docs/ilimanager.html')
+	inputs.file infile
+	outputs.file outfile
+	doFirst{
+		new File(project.buildDir,'docs').mkdir()
+	}
+		workingDir = project.buildDir
+		executable python
+		args = [rst2html, infile, outfile]
+}
+
+task bindist(type: Zip){
+	baseName = project.name
+	destinationDir = file('dist')
+	from jar
+	into('docs'){
+		from files("LICENSE","README.md","docs/CHANGELOG.txt",new File(project.buildDir,'docs/ilimanager.html'))
+	}
+	into('libs'){
+		from configurations.runtimeClasspath
+		//def jars=[]
+		//subprojects.each {
+        //	jars+=it.libsDir
+        //}
+        //from jars
+	}
+	// version = '1.0.6'
+}

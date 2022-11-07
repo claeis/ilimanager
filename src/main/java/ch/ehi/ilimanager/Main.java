@@ -283,7 +283,7 @@ public class Main {
 	protected static void printDescription ()
 	{
 	  System.err.println("DESCRIPTION");
-	  System.err.println("  Creates/Updates INTERLIS repository index files.");
+	  System.err.println("  creates/updates INTERLIS repository index files.");
 	}
 
 	/** Prints program usage.

@@ -1,0 +1,205 @@
+======================
+ilimanager-Anleitung
+======================
+
+Überblick
+=========
+
+ilimanager ist ein in Java erstelltes Programm, um die Index-Dateien der
+INTERLIS-Repositories automatisch zu pflegen.
+
+Es bestehen u.a. folgende Funktionen:
+
+- Erstellen einer ersten Version ilimodels.xml anhand von existierenden Modellen (ili-Dateien)
+- Nachführen einer bestehenden ilimodels.xml Datei anhand einer neuen Version eines Modells
+- Erstellen einer ersten Version ilidata.xml anhand von existierenden Daten (itf-/xtf/xml-Dateien)
+- Nachführen einer bestehenden ilidata.xml Datei anhand einer neuen Version einer Daten-Datei
+- Replizieren eines Repositories (z.B. für eine lokale Kopie)
+
+
+Log-Meldungen
+-------------
+Die Log-Meldungen sollen dem Benutzer zeigen, was das Programm macht.
+Am Anfang erscheinen Angaben zur Programm-Version.::
+	
+  Info: ilimanager-1.0.0
+  ...
+  Info: compile models...
+  ...
+  Info: ...clone done
+
+Bei einem Fehler wird das am Ende des Programms vermerkt. Der eigentliche 
+Fehler wird aber in der Regel schon früher ausgegeben.::
+	
+  Info: ilimanager-1.0.0
+  ...
+  Info: compile models...
+  ...
+  Error: failed to read ilimodels.xml
+  ...
+  Error: ...clone failed
+
+Laufzeitanforderungen
+---------------------
+
+Das Programm setzt Java 1.8 voraus.
+
+Lizenz
+------
+
+GNU Lesser General Public License
+
+Funktionsweise
+==============
+
+In den folgenden Abschnitten wird die Funktionsweise anhand einzelner
+Anwendungsfälle beispielhaft beschrieben. Die detaillierte Beschreibung
+einzelner Funktionen ist im Kapitel „Referenz“ zu finden.
+
+Es existiert aktuell kein GUI. 
+Das Programm kann nur über die Kommandozeile benutzt werden.
+
+Beispiele
+---------
+
+Fall 1
+~~~~~~
+
+Es werden alle Dateien (ITF und XTF) im gegebenen Verzeichnis ``folder`` analysiert
+und dann ein neues ``newIlidata.xml`` mit den entsprechenden Metadaten erstellt.
+
+``java -jar ilimanager.jar --createIliData --ilidata newIlidata.xml --repos folder``
+
+Fall 2
+~~~~~~~
+
+Es werden alle Dateien (ITF und XTF) gemäss Dateiliste ``files.txt`` 
+im Repository ``http://models.geo.admin.ch`` analysiert
+und dann ein neues ``newIlidata.xml`` mit den entsprechenden Metadaten erstellt.
+
+``java -jar ilimanager.jar --createIliData --ilidata newIlidata.xml --repos http://models.geo.admin.ch --srcfiles files.txt``
+
+Fall 3
+~~~~~~~
+
+Es wird die gegebene Datei ``newVersionOfData.xml`` (ITF oder XTF)
+analysiert, und dann das ilidata.xml aus dem gegebenen Repository 
+``http://models.geo.admin.ch`` mit einem neuen Eintrag für 
+den Datensatz mit der ID ``datasetId`` aktualisiert. Die neue Version des 
+ilidata.xml wird in die Datei ``updatedIlidata.xml`` geschrieben und muss
+durch den Benutzer ins Repository übertragen werden.
+
+``java -jar ilimanager.jar --updateIliData --ilidata updatedIlidata.xml --repos http://models.geo.admin.ch --datasetId datasetId newVersionOfData.xml``
+
+
+Referenz
+========
+
+In den folgenden Abschnitten werden einzelne Aspekte detailliert, aber
+isoliert, beschrieben. Die Funktionsweise als Ganzes wird anhand
+einzelner Anwendungsfälle beispielhaft im Kapitel „Funktionsweise“
+(weiter oben) beschrieben.
+
+Aufruf-Syntax
+-------------
+
+``java -jar ilimanager.jar [Options]``
+
+Es existiert aktuell kein GUI. 
+Das Programm kann nur über die Kommandozeile benutzt werden.
+
+Der Rückgabewert ist wie folgt:
+
+  - 0 Funktion ok, keine Fehler festgestellt
+  - !0 Funktion nicht ok, Fehler festgestellt
+
+Optionen:
+
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Option                                      | Beschreibung                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
++=============================================+========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| ``--modeldir path``                         | Dateipfade, die Modell-Dateien (ili-Dateien) enthalten. Mehrere Pfade können durch Semikolon ‚;‘ getrennt werden. Es sind auch URLs von Modell-Repositories möglich. Default ist                                                                                                                                                                                                                                                                                                                                                       |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             | %ITF\_DIR;http://models.interlis.ch/;%JAR\_DIR/ilimodels                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             | %ITF\_DIR ist ein Platzhalter für das Verzeichnis mit der Transferdatei.                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             | %JAR\_DIR ist ein Platzhalter für das Verzeichnis des ilivalidator Programms (ilivalidator.jar Datei).                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             | Der erste Modellname (Hauptmodell), zu dem ili2db die ili-Datei sucht, ist nicht von der INTERLIS-Sprachversion abhängig. Es wird in folgender Reihenfolge nach einer ili-Datei gesucht: zuerst INTERLIS 2.3, dann 1.0 und zuletzt 2.2.                                                                                                                                                                                                                                                                                                |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             | Beim Auflösen eines IMPORTs wird die INTERLIS Sprachversion des Hauptmodells berücksichtigt, so dass also z.B. das Modell Units für ili2.2 oder ili2.3 unterschieden wird.                                                                                                                                                                                                                                                                                                                                                             |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--createIliData``                         | Es werden alle Daten (ITF und XTF) im gegebenen Folder/Repository analysiert und dann ein neues ilidata.xml mit den entsprechenden Metadaten erstellt. Wenn ``repository`` ein remote Repository bezeichnet, muss mit ``--srcfiles`` die Liste der Dateien angegeben werden.                                                                                                                                                                                                                                                           |
+| ``--ilidata ilidata.xml``                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ``--repos repository``                      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--srcfiles files.txt``                    | Liste mit relativen Dateipfaden (relativ zum gegebenen Folder/Repository). Ein Pfad pro Zeile.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--updateIliData``                         | Es wird die gegebene Datei ``newVersionOfData.xml`` (ITF oder XTF) analysiert, und dann das ilidata.xml aus dem gegebenen Repository ``repository`` mit einem neuen Eintrag für  den Datensatz mit der ID ``datasetId`` aktualisiert. Die neue Version des ilidata.xml wird in die Datei ``updatedIlidata.xml`` geschrieben und muss durch den Benutzer ins Repository übertragen werden.                                                                                                                                              |
+| ``--ilidata updatedIlidata.xml``            |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ``--repos repository``                      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ``--dataset datasetId``                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ``newVersionOfData.xml``                    |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|                                             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--log filename``                          | Schreibt die log-Meldungen in eine Text-Datei.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--plugins folder``                        | Verzeichnis mit JAR-Dateien, die Zusatzfunktionen enthalten. Die Zusatzfunktionen müssen das Java-Interface ``ch.interlis.iox_j.validator.InterlisFunction`` implementieren, und der Name der Java-Klasse muss mit ``IoxPlugin`` enden.                                                                                                                                                                                                                                                                                                |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--proxy host``                            | Proxy Server für den Zugriff auf Modell Repositories                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--proxyPort port``                        | Proxy Port für den Zugriff auf Modell Repositories                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--trace``                                 | Erzeugt zusätzliche Log-Meldungen (wichtig für Programm-Fehleranalysen)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--help``                                  | Zeigt einen kurzen Hilfetext an.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``--version``                               | Zeigt die Version des Programmes an.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
++---------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
+INTERLIS-Metaattribute
+~~~~~~~~~~~~~~~~~~~~~~
+Einzelne Funktionen nutzen Meta-Attribute. 
+Metaattribute stehen unmittelbar vor dem Modellelement das sie betreffen und beginnen mit ``!!@``.
+Falls der Wert (rechts von ```=```) aus mehreren durch Leerstellen getrennten Wörtern besteht, muss er mit Gänsefüsschen eingerahmt werden (```"..."```).
+
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| Modelelement     | Metaattribut                                | Beschreibung                                                                      |
++==================+=============================================+===================================================================================+
+| ModelDef         | ::                                          |  Wert für das Attribut technicalContact im ilimodels.xml Eintrag des Modells.     |
+|                  |                                             |                                                                                   |
+|                  |  technicalContact                           |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          | GeoIV-Identifikator dieses Modells. Mehrere Einträge durch Komma getrennt.        |
+|                  |                                             | Beispiel:                                                                         |
+|                  |  IDGeoIV                                    |                                                                                   |
+|                  |                                             | ::                                                                                |
+|                  |                                             |                                                                                   |
+|                  |                                             |   !!@ IDGeoIV="114.1, 114.3"                                                      |
+|                  |                                             |                                                                                   |
+|                  |                                             | Der Wert wird auch für das Attribut tags im ilimodels.xml Eintrag des Modells     |
+|                  |                                             | verwendet.                                                                        |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          |  Wert für das Attribut furtherInformation im ilimodels.xml Eintrag des Modells.   |
+|                  |                                             |                                                                                   |
+|                  |  furtherInformation                         |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          |  Wert für das Attribut tags im ilimodels.xml Eintrag des Modells.                 |
+|                  |                                             |                                                                                   |
+|                  |  tags                                       |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          |  Wert für das Attribut precursorVersion im ilimodels.xml Eintrag des Modells.     |
+|                  |                                             |                                                                                   |
+|                  |  precursorVersion                           |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          |  Wert für das Attribut furtherMetadata im ilimodels.xml Eintrag des Modells.      |
+|                  |                                             |                                                                                   |
+|                  |  furtherMetadata                            |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
+| ModelDef         | ::                                          |  Wert für das Attribut Original im ilimodels.xml Eintrag des Modells.             |
+|                  |                                             |                                                                                   |
+|                  |  Original                                   |                                                                                   |
++------------------+---------------------------------------------+-----------------------------------------------------------------------------------+
