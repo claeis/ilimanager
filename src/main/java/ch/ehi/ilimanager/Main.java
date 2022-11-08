@@ -215,7 +215,7 @@ public class Main {
     private static void runGui(Method mainFrameMain, String[] xtfFile, Settings settings) {
         if(mainFrameMain!=null) {
             try {
-                mainFrameMain.invoke(null, xtfFile,settings);
+                mainFrameMain.invoke(null);
                 return;                 
             } catch (IllegalArgumentException ex) {
                 EhiLogger.logError("failed to open GUI",ex);
