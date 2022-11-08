@@ -2,6 +2,6 @@ LATEST VERSION
 -----------------------------
 
 
-ilimanager 1.0.0 (2022-xx-xx)
+ilimanager 1.0.0 (2022-11-08)
 -------------------------------
 - initial coding/release
