@@ -28,9 +28,8 @@ public class UpdateIliDataToolTest {
         java.io.File src=new java.io.File(TEST_DATA,"ilidata.xml");
         java.nio.file.Files.copy(java.nio.file.Paths.get(TEST_DATA,"ilidata.xml") ,java.nio.file.Paths.get(ILIDATA_XML),StandardCopyOption.REPLACE_EXISTING);
         Settings settings = new Settings();
-        settings.setValue(Main.SETTING_DATASETID_TO_UPDATE, "Beispiel2a");
         settings.setValue(Main.SETTING_ILIDIRS, TEST_DATA);
-        boolean ret = UpdateIliDataTool.update(new File(ILIDATA_XML),TEST_DATA+"repos1",new File(TEST_DATA,"newVersionOfData.xtf"),settings);
+        boolean ret = UpdateIliDataTool.update(new File(ILIDATA_XML),TEST_DATA+"repos1",new File(TEST_DATA,"newVersionOfData.xtf"),"Beispiel2a",settings);
         assertTrue(ret);
         
         validateResult();

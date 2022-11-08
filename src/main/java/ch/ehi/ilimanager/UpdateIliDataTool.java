@@ -37,14 +37,13 @@ import ch.interlis.models.DatasetIdx16.DataIndex.DatasetMetadata;
 
 public class UpdateIliDataTool {
 
-    public static boolean update(File ilidataxml,String repos,File newVersionOfData,Settings settings) {
-        return new UpdateIliDataTool().updateIliData(ilidataxml,repos,newVersionOfData,settings);
+    public static boolean update(File ilidataxml,String repos,File newVersionOfData,String datasetID,Settings settings) {
+        return new UpdateIliDataTool().updateIliData(ilidataxml,repos,newVersionOfData,datasetID,settings);
     }
     
-    private boolean updateIliData(File newIliDataXml,String repository,File newVersionOfDataXml,Settings settings) {
+    private boolean updateIliData(File newIliDataXml,String repository,File newVersionOfDataXml,String datasetID,Settings settings) {
         
         try {
-            String datasetID = settings.getValue(Main.SETTING_DATASETID_TO_UPDATE);
             if (datasetID == null || datasetID.isEmpty()) {
                 throw new Exception("Dataset ID should be given as a parameter!");
             }

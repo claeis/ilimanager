@@ -58,12 +58,11 @@ public class CreateIliDataTool {
     private static final String CODES_MODEL = "http://codes.interlis.ch/model/";
     private static final String CODES_TYPE_REFERENCE_DATA = "http://codes.interlis.ch/type/referenceData";
 
-    public static boolean start(File newIliDataXml,String repos,Settings settings) {
-        return new CreateIliDataTool().createIliData(newIliDataXml,repos,settings);
+    public static boolean start(File newIliDataXml,String repos,File srcfilelist,Settings settings) {
+        return new CreateIliDataTool().createIliData(newIliDataXml,repos,srcfilelist,settings);
     }
 
-    private boolean createIliData(File newIliDataXml,String baseUrl,Settings settings) {
-        String filelistFile = settings.getValue(Main.SETTING_REMOTEFILE_LIST);
+    private boolean createIliData(File newIliDataXml,String baseUrl,File filelistFile,Settings settings) {
         ch.interlis.ili2c.Main.setHttpProxySystemProperties(settings);
 
         try {
@@ -387,7 +386,7 @@ public class CreateIliDataTool {
         }         
     }
     
-    private void readFilelistFromFile(String srcFile, Set<File> filelist) throws IOException, FileNotFoundException {
+    private void readFilelistFromFile(File srcFile, Set<File> filelist) throws IOException, FileNotFoundException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(srcFile));

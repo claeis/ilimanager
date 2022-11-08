@@ -25,7 +25,7 @@ public class CreateIliDataToolTest {
     public void localFolder() throws IoxException {
         Settings settings = new Settings();
         settings.setValue(Main.SETTING_ILIDIRS, TEST_DATA);
-        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"localfolder",settings);
+        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"localfolder",null,settings);
         assertTrue(ret);
         
         validateResult();
@@ -35,17 +35,16 @@ public class CreateIliDataToolTest {
     public void localFolderNonExisiting_Fail() throws IoxException {
         Settings settings = new Settings();
         settings.setValue(Main.SETTING_ILIDIRS, TEST_DATA);
-        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"nonExistingFolder",settings);
+        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"nonExistingFolder",null,settings);
         assertFalse(ret);
     }
     
     @Test
     public void repository() throws Iox2jtsException, IoxException {
         Settings settings = new Settings();
-        settings.setValue(Main.SETTING_REMOTEFILE_LIST, TEST_DATA+"filelist.txt");
         settings.setValue(Main.SETTING_ILIDIRS, TEST_DATA);
         
-        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"repos1",settings);
+        boolean ret = CreateIliDataTool.start(new File(ILIDATA_XML),TEST_DATA+"repos1",new File(TEST_DATA+"filelist.txt"),settings);
         assertTrue(ret);
         
         validateResult();
