@@ -155,3 +155,23 @@ uploadArchives {
         }
     }
 }
+
+task uploadBin(dependsOn: bindist) {
+	doLast {
+		ant.taskdef(name: 'ftp',
+					classname: 'org.apache.tools.ant.taskdefs.optional.net.FTP',
+					classpath: configurations.ftpAntTask.asPath)
+		def dist= bindist.archiveFile.get().asFile.parent
+		def name=bindist.archiveFile.get().asFile.name
+		def json = groovy.json.JsonOutput.toJson([filename: 'https://downloads.interlis.ch/ilimanager/'+name, version: project.version ,date: new Date().format( 'yyyy-MM-dd' )])
+		def releaseFile = new File(dist,project.name+"-release.json")
+		releaseFile.write(json)
+		ant.ftp(server: "jql.ftp.infomaniak.com", userid: downloads_usr, password: downloads_pwd, 
+			remoteDir: "/ilimanager", passive:"yes") {
+				fileset(dir: dist ) {
+					include(name: name)
+					include(name: releaseFile.name)
+				}
+		}
+	}
+}
