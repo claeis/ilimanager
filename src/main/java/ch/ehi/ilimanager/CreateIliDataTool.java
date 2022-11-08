@@ -58,14 +58,12 @@ public class CreateIliDataTool {
     private static final String CODES_MODEL = "http://codes.interlis.ch/model/";
     private static final String CODES_TYPE_REFERENCE_DATA = "http://codes.interlis.ch/type/referenceData";
 
-    public static boolean start(Settings settings) {
-        return new CreateIliDataTool().createIliData(settings);
+    public static boolean start(File newIliDataXml,String repos,Settings settings) {
+        return new CreateIliDataTool().createIliData(newIliDataXml,repos,settings);
     }
 
-    private boolean createIliData(Settings settings) {
-        String destinationFile = settings.getValue(Main.SETTING_ILIDATA_XML);
+    private boolean createIliData(File newIliDataXml,String baseUrl,Settings settings) {
         String filelistFile = settings.getValue(Main.SETTING_REMOTEFILE_LIST);
-        String baseUrl = settings.getValue(Main.SETTING_REPOSITORY);
         ch.interlis.ili2c.Main.setHttpProxySystemProperties(settings);
 
         try {
@@ -80,7 +78,7 @@ public class CreateIliDataTool {
                 }
                 scanLocalFolder(localFolder, null, filelist);
             }
-            readFilesFromSourceFolder(new File(destinationFile), filelist, baseUrl, settings);
+            readFilesFromSourceFolder(newIliDataXml, filelist, baseUrl, settings);
         }catch (Exception e) {
             EhiLogger.logError(e);
             return false;

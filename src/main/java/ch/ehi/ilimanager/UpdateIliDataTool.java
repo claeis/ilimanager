@@ -37,18 +37,13 @@ import ch.interlis.models.DatasetIdx16.DataIndex.DatasetMetadata;
 
 public class UpdateIliDataTool {
 
-    public static boolean update(File newVersionOfData,Settings settings) {
-        return new UpdateIliDataTool().updateIliData(newVersionOfData,settings);
+    public static boolean update(File ilidataxml,String repos,File newVersionOfData,Settings settings) {
+        return new UpdateIliDataTool().updateIliData(ilidataxml,repos,newVersionOfData,settings);
     }
     
-    private boolean updateIliData(File newVersionOfDataXml,Settings settings) {
+    private boolean updateIliData(File newIliDataXml,String repository,File newVersionOfDataXml,Settings settings) {
         
         try {
-            String ilidataXmlFileToWrite = settings.getValue(Main.SETTING_ILIDATA_XML);
-            if (ilidataXmlFileToWrite == null || ilidataXmlFileToWrite.isEmpty()) {
-                throw new Exception("Name of ouptut file required");
-            }
-            
             String datasetID = settings.getValue(Main.SETTING_DATASETID_TO_UPDATE);
             if (datasetID == null || datasetID.isEmpty()) {
                 throw new Exception("Dataset ID should be given as a parameter!");
@@ -58,7 +53,6 @@ public class UpdateIliDataTool {
                 throw new Exception("New version of data file should be given as a parameter.");
             }
             
-            String repository = settings.getValue(Main.SETTING_REPOSITORY);
             if (repository == null || repository.isEmpty()) {
                 throw new Exception("Repository should be given as a parameter!");
             } 
@@ -112,7 +106,7 @@ public class UpdateIliDataTool {
             }
             
             // Write the Result in ilidata.xml
-            writeNewIliData(new File(ilidataXmlFileToWrite), newMetadata, oldIlidataContents, localCopyOfRemoteOriginalIliDataXml);
+            writeNewIliData(newIliDataXml, newMetadata, oldIlidataContents, localCopyOfRemoteOriginalIliDataXml);
         } catch (Exception e) {
             EhiLogger.logError(e);
             return false;

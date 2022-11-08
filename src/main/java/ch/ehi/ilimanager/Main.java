@@ -64,13 +64,13 @@ public class Main {
 		    }
 		}
 		// arguments on export
-		String[] xtfFile=null;
+		String xtfFile=null;
 		String outFile=null;
+        String repos=null;
 		if(args.length==0){
-			xtfFile=new String[0];
 			readSettings(settings);
             // MainFrame.main(xtfFile,settings);
-			runGui(mainFrameMain, xtfFile, settings);     
+			runGui(mainFrameMain, settings);     
 			return;
 		}
 		int argi=0;
@@ -96,12 +96,12 @@ public class Main {
                 function=FC_ILIMODELS_XML_CREATE;
             }else if (arg.equals("--updateIliModels")) {
                 function=FC_ILIMODELS_XML_UPDATE;
-            }else if (arg.equals("--ilidata")) {
-                argi++;
-			    settings.setValue(Main.SETTING_ILIDATA_XML, args[argi]);
             }else if (arg.equals("--out")) {
                 argi++;
                 outFile=args[argi];
+            }else if (arg.equals("--data")) {
+                argi++;
+                xtfFile=args[argi];
 			}else if (arg.equals("--srcfiles")) {
 			    argi++;
 			    settings.setValue(Main.SETTING_REMOTEFILE_LIST, args[argi]);
@@ -110,7 +110,7 @@ public class Main {
 			    settings.setValue(Main.SETTING_DATASETID_TO_UPDATE, args[argi]);
             }else if (arg.equals("--repos")) {
                 argi++;
-                settings.setValue(Main.SETTING_REPOSITORY, args[argi]);
+                repos=args[argi];
 			}else if(arg.equals("--log")) {
 			    argi++;
 			    settings.setValue(Main.SETTING_LOGFILE, args[argi]);
@@ -142,8 +142,8 @@ public class Main {
 					System.err.println("--createIliData       create a new ilidata.xml");
                     System.err.println("--updateIliData       update an existing ilidata.xml");
 					System.err.println("--srcfiles file       file with list of relative file names");
+                    System.err.println("--data file           data file");
 					System.err.println("--datasetId ID        the ID of the dataset to be updated");
-                    System.err.println("--ilidata file        ilidata.xml file");
                     System.err.println("--repos URL           source repository or folder");
                     System.err.println("--out file            output file or folder");
 				    System.err.println("--log file            text file, that receives validation results.");
@@ -163,43 +163,27 @@ public class Main {
 				break;
 			}
 		}
-		int dataFileCount=args.length-argi;
 		if(doGui){
-			if(dataFileCount>0) {
-				xtfFile = getDataFiles(args, argi, dataFileCount);
-			}
 			//MainFrame.main(xtfFile,settings);
-            runGui(mainFrameMain, xtfFile, settings);                     
+            runGui(mainFrameMain, settings);                     
             return;
 		}else{
-            xtfFile = getDataFiles(args, argi, dataFileCount);
             boolean ok=false;
             if(function==FC_NOOP) {
                 ok=true;
             }else if(function==FC_MODEL_REPOS_CLONE) {
                 CloneRepos cloner=new CloneRepos();
-                String srcRepos=settings.getValue(SETTING_REPOSITORY);
-                ok=cloner.cloneRepos(new File(outFile),new String[] {srcRepos}, settings);
+                ok=cloner.cloneRepos(new File(outFile),new String[] {repos}, settings);
             }else if(function==FC_ILIMODELS_XML_CREATE) {
                 MakeIliModelsXml2 makeIliModelsXml=new MakeIliModelsXml2();
-                String srcRepos=settings.getValue(SETTING_REPOSITORY);
-                ok=makeIliModelsXml.mymain(false,new File(outFile),srcRepos,settings);
+                ok=makeIliModelsXml.mymain(false,new File(outFile),repos,settings);
             }else if(function==FC_ILIMODELS_XML_UPDATE) {
                 MakeIliModelsXml2 makeIliModelsXml=new MakeIliModelsXml2();
-                String srcRepos=settings.getValue(SETTING_REPOSITORY);
-                ok=makeIliModelsXml.mymain(true,new File(outFile),srcRepos,settings);
+                ok=makeIliModelsXml.mymain(true,new File(outFile),repos,settings);
             }else if(function==FC_CREATE_ILIDATA_XML) {
-                if(dataFileCount!=0) {
-                    EhiLogger.logError(APP_NAME+": wrong number of arguments");
-                    System.exit(2);                 
-                }
-                ok = CreateIliDataTool.start(settings);
+                ok = CreateIliDataTool.start(new File(outFile),repos,settings);
             }else if (function==FC_UPDATE_ILIDATA_XML) {
-                if (dataFileCount != 1) {
-                    EhiLogger.logError(APP_NAME+": wrong number of arguments");
-                    System.exit(2);                     
-                }
-                ok = UpdateIliDataTool.update(new File(xtfFile[0]),settings);
+                ok = UpdateIliDataTool.update(new File(outFile),repos,new File(xtfFile),settings);
             }else {
                 throw new IllegalStateException("function=="+function);
             }
@@ -212,7 +196,7 @@ public class Main {
         buf.append(val);
         return buf.toString();
     }
-    private static void runGui(Method mainFrameMain, String[] xtfFile, Settings settings) {
+    private static void runGui(Method mainFrameMain, Settings settings) {
         if(mainFrameMain!=null) {
             try {
                 mainFrameMain.invoke(null);
@@ -229,17 +213,6 @@ public class Main {
         }
         System.exit(2);
     }
-    private static String[] getDataFiles(String[] args, int argi, int dataFileCount) {
-		String[] xtfFile;
-		xtfFile=new String[dataFileCount];
-		int fileCount=0;
-		while(argi<args.length){
-			xtfFile[fileCount]=args[argi];
-			fileCount+=1;
-			argi++;
-		}
-		return xtfFile;
-	}
 	/** Name of file with program settings. Only used by GUI, not used by commandline version.
 	 */
 	private final static String SETTINGS_FILE = System.getProperty("user.home") + "/.ilimanager";
@@ -331,15 +304,9 @@ public class Main {
 	}
 
 	
-    /** Repository URL
-     */
-    public static final String SETTING_REPOSITORY="org.interlis2.validator.baseUrl";
     /** Name of file with the list of filenames.
      */
     public static final String SETTING_REMOTEFILE_LIST="org.interlis2.validator.filelist";
-    /** Name of the ilidata file (XTF format) to write.
-     */
-    public static final String SETTING_ILIDATA_XML="org.interlis2.validator.ilidata";
     /** Dataset ID of the data.
      */
     public static final String SETTING_DATASETID_TO_UPDATE = "org.interlis2.validator.datasetIDToUpdate";
