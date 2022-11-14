@@ -1,0 +1,7 @@
+INTERLIS 2.3;
+
+MODEL Model
+  AT "mailto:ce@eisenhutinformatik.ch" VERSION "2020-03-23" =
+  IMPORTS Basis;
+    
+END Model.

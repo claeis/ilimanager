@@ -116,8 +116,13 @@ public class MakeIliModelsXml2 {
 					// compile
 					Ili2cSettings ili2cSettings = new Ili2cSettings();
 					ili2cSettings.setHttpProxyHost(settings.getValue(ch.interlis.ili2c.gui.UserSettings.HTTP_PROXY_HOST));
-					ili2cSettings.setHttpProxyPort(ch.interlis.ili2c.gui.UserSettings.HTTP_PROXY_PORT);
-					ili2cSettings.setIlidirs(repositoryRoot+";"+Main.SETTING_ILIDIRS);
+					ili2cSettings.setHttpProxyPort(settings.getValue(ch.interlis.ili2c.gui.UserSettings.HTTP_PROXY_PORT));
+					String settingsIliDirs=settings.getValue(Main.SETTING_ILIDIRS);
+					if(settingsIliDirs!=null) {
+	                    ili2cSettings.setIlidirs(repositoryRoot+";"+settingsIliDirs);
+					}else {
+	                    ili2cSettings.setIlidirs(repositoryRoot);
+					}
 					ili2cSettings.setTransientObject(Ili2cSettings.TEMP_REPOS_ILIFILES, tempIliFiles);
 					ili2cSettings.setTransientObject(Ili2cSettings.TEMP_REPOS_URI, repositoryRoot);
 					Configuration config = new Configuration();
