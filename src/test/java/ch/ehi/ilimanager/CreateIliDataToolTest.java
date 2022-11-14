@@ -52,18 +52,22 @@ public class CreateIliDataToolTest {
     
     private void validateResult() throws IoxException {
         XtfReader reader = new XtfReader(new File(ILIDATA_XML));
-        
-        IoxEvent event = null;
         HashMap<String,IomObject> objs=new HashMap<String,IomObject>();
-        do {
-            event = reader.read();
-            if (event instanceof ObjectEvent) {
-                IoxEvent event1 = event;
-                IomObject iomObject = ((ObjectEvent) event1).getIomObject();
-                String id=iomObject.getattrvalue(ch.interlis.models.DatasetIdx16.Metadata.tag_id);
-                objs.put(id, iomObject);
-            }
-        } while (!(event instanceof EndTransferEvent));
+        try {
+            IoxEvent event = null;
+            do {
+                event = reader.read();
+                if (event instanceof ObjectEvent) {
+                    IoxEvent event1 = event;
+                    IomObject iomObject = ((ObjectEvent) event1).getIomObject();
+                    String id=iomObject.getattrvalue(ch.interlis.models.DatasetIdx16.Metadata.tag_id);
+                    objs.put(id, iomObject);
+                }
+            } while (!(event instanceof EndTransferEvent));
+            
+        }finally {
+            reader.close();
+        }
         assertEquals(3, objs.size());
         {
             IomObject iomObject = objs.get("Beispiel1a");

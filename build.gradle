@@ -4,7 +4,7 @@ plugins {
 
 }
 
-version '0.9.0'+System.getProperty('release','-SNAPSHOT')
+version '0.9.1'+System.getProperty('release','-SNAPSHOT')
 group 'ch.ehi'
 
 configurations {
