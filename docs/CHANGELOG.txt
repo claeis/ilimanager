@@ -1,5 +1,8 @@
 LATEST VERSION
 -----------------------------
+
+ilimanager 0.9.1 (2022-11-14)
+-------------------------------
 - fix "Folder ch.ehi.ilimanager.ilidirs doesn't exist; ignored" (#5)
 
 ilimanager 0.9.0 (2022-11-08)
