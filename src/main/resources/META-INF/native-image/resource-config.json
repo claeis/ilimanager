@@ -1,0 +1,8 @@
+{
+  "bundles":[
+    {
+      "name":"ch.ehi.ilimanager.Version",
+      "locales":[""]
+    }
+  ]
+}
