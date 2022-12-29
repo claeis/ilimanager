@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.HashMap;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.interlis2.validator.Validator;
 import org.junit.Test;
@@ -56,7 +58,8 @@ public class MakeIliModelsXmlTest {
                 assertEquals("ili2_3",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_SchemaLanguage));
                 assertEquals("Model23.ili",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_File));
                 assertEquals("2020-03-23",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_Version));
-                assertEquals("2022-11-14",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_publishingDate));
+                String today = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                assertEquals(today,iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_publishingDate));
                 assertEquals("mailto:ce@eisenhutinformatik.ch",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_Issuer));
                 assertEquals("false",iomObject.getattrvalue(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_browseOnly));
                 IomObject dependsOn = iomObject.getattrobj(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata.tag_dependsOnModel, 0);
