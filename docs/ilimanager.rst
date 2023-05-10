@@ -124,7 +124,7 @@ Fall 3.1
 Es werden alle Modelle aus einem bestehenden Repository in ein neues Verzeichnis 
 kopiert.
 
-``java -jar ilimanager.jar java --cloneIliRepos --out newReposFolder --repos http://models.interlis.ch``
+``java -jar ilimanager.jar --cloneIliRepos --out newReposFolder --repos http://models.interlis.ch``
 
 Referenz
 ========
