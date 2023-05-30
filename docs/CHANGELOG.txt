@@ -1,5 +1,6 @@
 LATEST VERSION
 -----------------------------
+- repos clone: unset/clear precursorVersion
 
 ilimanager 0.9.1 (2022-11-14)
 -------------------------------

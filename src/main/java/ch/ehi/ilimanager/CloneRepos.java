@@ -108,6 +108,7 @@ public class CloneRepos {
 			StartBasketEvent startBasketEvent = new StartBasketEvent( ILIREPOSITORY20.RepositoryIndex, "b1");
 			ioxWriter.write( startBasketEvent );
 			for(ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata model:mergedModelMetadatav){
+                model.setattrundefined(model.tag_precursorVersion);
 				ioxWriter.write(new ObjectEvent(model));
 			}
 			
