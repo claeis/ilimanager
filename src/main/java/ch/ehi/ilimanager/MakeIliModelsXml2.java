@@ -236,7 +236,7 @@ public class MakeIliModelsXml2 {
 					ioxWriter.flush();
 				}catch(java.io.FileNotFoundException ex){
 					EhiLogger.logError(ex);
-					System.exit(1);
+					return false;
 				}finally{
 					if(ioxWriter!=null){
 						ioxWriter.close();

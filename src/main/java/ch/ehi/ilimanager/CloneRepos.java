@@ -28,14 +28,21 @@ import ch.interlis.iox_j.StartBasketEvent;
 import ch.interlis.iox_j.StartTransferEvent;
 
 public class CloneRepos {
-
+    
+    /** clones the current ili-models from the given repositories to a new repository.
+     * @param destFolder new repository (destination).
+     * @param srcRepos repositories to clone (source).
+     * @param settings
+     * @return fail status (false ok, true failed)
+     */
 	public boolean cloneRepos(File destFolder,String srcRepos[],
 	        Settings settings) {
-		boolean failed=false;
+		boolean ok=true;
 		ch.interlis.ili2c.Main.setHttpProxySystemProperties(settings);
 		if(destFolder==null) {
 			EhiLogger.logError("no output folder given");
-			return true;
+			ok=false;
+			return ok;
 		}
 		ArrayList<ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata> mergedModelMetadatav = new ArrayList<ch.interlis.models.IliRepository20.RepositoryIndex.ModelMetadata>();
 		destFolder.mkdir();
@@ -51,7 +58,7 @@ public class CloneRepos {
 					ilimodelsFile = reposAccess.getLocalFileLocation(repos,IliManager.ILIMODELS_XML,0,null);
 				} catch (RepositoryAccessException e2) {
 					EhiLogger.logError(e2);
-					failed=true;
+					ok=false;
 					continue;
 				}
 				if(ilimodelsFile==null){
@@ -67,7 +74,7 @@ public class CloneRepos {
 					files = RepositoryAccess.createIliFiles2(repos, modelMetadatav);
 				} catch (RepositoryAccessException e2) {
 					EhiLogger.logError(e2);
-					failed=true;
+					ok=false;
 					continue;
 				}
 				for(Iterator<IliFile> filei=files.iteratorFile();filei.hasNext();){
@@ -84,7 +91,7 @@ public class CloneRepos {
 							RepositoryAccess.copyFile(destFile, srcFile);
 						} catch (RepositoryAccessException e1) {
 							EhiLogger.logError(e1);
-							failed=true;
+							ok=false;
 						}
 
 				}
@@ -118,10 +125,10 @@ public class CloneRepos {
 			ioxWriter.flush();
 		}catch(java.io.FileNotFoundException ex){
 			EhiLogger.logError(ex);
-			failed=true;
+			ok=false;
 		} catch (IoxException ex) {
 			EhiLogger.logError(ex);
-			failed=true;
+			ok=false;
 		}finally{
 			if(ioxWriter!=null){
 				try {
@@ -140,7 +147,7 @@ public class CloneRepos {
 				outStream=null;
 			}
 		}
-		return failed;
+		return ok;
 	}
 
 	private String escapeReposUri(String uri) {

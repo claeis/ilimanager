@@ -1,6 +1,7 @@
 LATEST VERSION
 -----------------------------
 - repos clone: unset/clear precursorVersion
+- fix succesfull execution returns errorlevel "1" instead of "0" (#13) 
 
 ilimanager 0.9.1 (2022-11-14)
 -------------------------------
